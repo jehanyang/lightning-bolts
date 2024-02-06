@@ -122,11 +122,11 @@ class SimCLR(LightningModule):
         self.warmup_epochs = warmup_epochs
         self.max_epochs = max_epochs
 
+        self.pretrained = pretrained
+
         self.encoder = self.init_model()
 
         self.projection = Projection(input_dim=self.hidden_mlp, hidden_dim=self.hidden_mlp, output_dim=self.feat_dim)
-
-        self.pretrained = pretrained
 
         # compute iters per epoch
         global_batch_size = self.num_nodes * self.gpus * self.batch_size if self.gpus > 0 else self.batch_size
