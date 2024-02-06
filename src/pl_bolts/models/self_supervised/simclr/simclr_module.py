@@ -84,6 +84,7 @@ class SimCLR(LightningModule):
         learning_rate: float = 1e-3,
         final_lr: float = 0.0,
         weight_decay: float = 1e-6,
+        pretrained: bool = False,
         **kwargs
     ) -> None:
         """
@@ -125,6 +126,8 @@ class SimCLR(LightningModule):
 
         self.projection = Projection(input_dim=self.hidden_mlp, hidden_dim=self.hidden_mlp, output_dim=self.feat_dim)
 
+        self.pretrained = pretrained
+
         # compute iters per epoch
         global_batch_size = self.num_nodes * self.gpus * self.batch_size if self.gpus > 0 else self.batch_size
         self.train_iters_per_epoch = self.num_samples // global_batch_size
@@ -135,7 +138,7 @@ class SimCLR(LightningModule):
         elif self.arch == "resnet50":
             backbone = resnet50
 
-        return backbone(first_conv=self.first_conv, maxpool1=self.maxpool1, return_all_feature_maps=False)
+        return backbone(pretrained=self.pretrained, first_conv=self.first_conv, maxpool1=self.maxpool1, return_all_feature_maps=False)
 
     def forward(self, x):
         # bolts resnet returns a list
