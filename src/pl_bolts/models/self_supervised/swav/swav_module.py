@@ -16,8 +16,20 @@ from pl_bolts.transforms.dataset_normalizations import (
     imagenet_normalization,
     stl10_normalization,
 )
+from torch.utils.model_zoo import load_url as load_state_dict_from_url
 
 
+MODEL_URLS = {
+    "resnet18": "https://download.pytorch.org/models/resnet18-5c106cde.pth",
+    "resnet34": "https://download.pytorch.org/models/resnet34-333f7ec4.pth",
+    "resnet50": "https://download.pytorch.org/models/resnet50-19c8e357.pth",
+    "resnet101": "https://download.pytorch.org/models/resnet101-5d3b4d8f.pth",
+    "resnet152": "https://download.pytorch.org/models/resnet152-b121ed2d.pth",
+    "resnext50_32x4d": "https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth",
+    "resnext101_32x8d": "https://download.pytorch.org/models/resnext101_32x8d-8ba56ff5.pth",
+    "wide_resnet50_2": "https://download.pytorch.org/models/wide_resnet50_2-95faca4d.pth",
+    "wide_resnet101_2": "https://download.pytorch.org/models/wide_resnet101_2-32ee1156.pth",
+}
 class SwAV(LightningModule):
     def __init__(
         self,
@@ -49,6 +61,7 @@ class SwAV(LightningModule):
         final_lr: float = 0.0,
         weight_decay: float = 1e-6,
         epsilon: float = 0.05,
+        pretrained: bool = False,
         **kwargs
     ) -> None:
         """
@@ -126,7 +139,14 @@ class SwAV(LightningModule):
         self.warmup_epochs = warmup_epochs
         self.max_epochs = max_epochs
 
+        self.pretrained = pretrained
+
         self.model = self.init_model()
+
+        if self.pretrained:
+            state_dict = load_state_dict_from_url(MODEL_URLS[arch], progress=True)
+            self.model.load_state_dict(state_dict)
+
         self.criterion = SWAVLoss(
             gpus=self.gpus,
             num_nodes=self.num_nodes,
