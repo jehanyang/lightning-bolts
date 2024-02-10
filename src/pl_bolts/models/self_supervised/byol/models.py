@@ -51,11 +51,12 @@ class SiameseArm(nn.Module):
         encoder_out_dim: int = 2048,
         projector_hidden_dim: int = 4096,
         projector_out_dim: int = 256,
+        pretrained: bool = False,
     ) -> None:
         super().__init__()
 
         if isinstance(encoder, str):
-            self.encoder = torchvision_ssl_encoder(encoder)
+            self.encoder = torchvision_ssl_encoder(encoder, pretrained=pretrained)
         else:
             self.encoder = encoder
 

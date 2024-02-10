@@ -11,7 +11,6 @@ from torch import Tensor
 from pl_bolts.models.self_supervised.byol.models import MLP, SiameseArm
 from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 
-
 class SimSiam(LightningModule):
     """PyTorch Lightning implementation of Exploring Simple Siamese Representation Learning (SimSiam_)_
 
@@ -73,12 +72,15 @@ class SimSiam(LightningModule):
         projector_out_dim: int = 2048,
         predictor_hidden_dim: int = 512,
         exclude_bn_bias: bool = False,
+        pretrained: bool = False,
         **kwargs,
     ) -> None:
         super().__init__()
         self.save_hyperparameters(ignore="base_encoder")
 
-        self.online_network = SiameseArm(base_encoder, encoder_out_dim, projector_hidden_dim, projector_out_dim)
+        self.online_network = SiameseArm(base_encoder, encoder_out_dim, projector_hidden_dim, projector_out_dim,
+                                         pretrained=self.pretrained)
+
         self.target_network = deepcopy(self.online_network)
         self.predictor = MLP(projector_out_dim, predictor_hidden_dim, projector_out_dim)
 
