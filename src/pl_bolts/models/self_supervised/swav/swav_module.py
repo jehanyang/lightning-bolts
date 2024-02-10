@@ -145,7 +145,7 @@ class SwAV(LightningModule):
 
         if self.pretrained:
             state_dict = load_state_dict_from_url(MODEL_URLS[arch], progress=True)
-            self.model.load_state_dict(state_dict)
+            self.model.load_state_dict(state_dict, strict=False)
 
         self.criterion = SWAVLoss(
             gpus=self.gpus,
